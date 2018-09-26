@@ -5,6 +5,13 @@
 #include "config.h"
 #include <stdio.h>
 
+#define JLTX_SENSOR
+
+#ifdef JLTX_SENSOR
+#define MOTION_DIR 1
+#else
+#define MOTION_DIR -1
+#endif
 
 //PAT9125 registers
 #define PAT9125_PID1			0x00
@@ -192,7 +199,7 @@ uint8_t pat9125_update(void)
 			if (iDX & 0x800) iDX -= 4096;
 			if (iDY & 0x800) iDY -= 4096;
 			pat9125_x += iDX;
-			pat9125_y -= iDY; //negative number, because direction switching does not work
+			pat9125_y += MOTION_DIR * iDY; //negative number, because direction switching does not work
 		}
 		return 1;
 	}
@@ -212,7 +219,7 @@ uint8_t pat9125_update_y(void)
 			if (pat9125_PID1 == 0xff) return 0;
 			int16_t iDY = ucYL | ((ucXYH << 8) & 0xf00);
 			if (iDY & 0x800) iDY -= 4096;
-			pat9125_y -= iDY; //negative number, because direction switching does not work
+			pat9125_y += MOTION_DIR * iDY; //negative number, because direction switching does not work
 		}
 		return 1;
 	}
@@ -229,7 +236,7 @@ uint8_t pat9125_update_y2(void)
 		{
 			int8_t dy = pat9125_rd_reg(PAT9125_DELTA_YL);
 			if (pat9125_PID1 == 0xff) return 0; //NOACK error
-			pat9125_y -= dy; //negative number, because direction switching does not work
+			pat9125_y += MOTION_DIR * dy; //negative number, because direction switching does not work
 		}
 		return 1;
 	}
