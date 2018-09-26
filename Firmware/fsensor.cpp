@@ -31,6 +31,14 @@
 #define FSENSOR_OQ_MAX_SH      13   //!< maximum shutter value
 //! @}
 
+#define JLTX_SENSOR // If we are using the indirect bearing to measure filament movement
+
+#ifndef JLTX_SENSOR
+#define FSENSOR_OQ_MAX_SH      13   //maximum shutter value
+#else
+#define FSENSOR_OQ_MAX_SH      22   //maximum shutter value
+#endif
+
 const char ERRMSG_PAT9125_NOT_RESP[] PROGMEM = "PAT9125 not responding (%d)!\n";
 
 // PJ7 can not be used (does not have PinChangeInterrupt possibility)
@@ -277,8 +285,12 @@ bool fsensor_check_autoload(void)
   	if (fsensor_autoload_c != fsensor_autoload_c_old)
   		printf_P(PSTR("fsensor_check_autoload dy=%d c=%d sum=%d\n"), dy, fsensor_autoload_c, fsensor_autoload_sum);
 #endif
+#ifndef JLTX_SENSOR
 //	if ((fsensor_autoload_c >= 15) && (fsensor_autoload_sum > 30))
 	if ((fsensor_autoload_c >= 12) && (fsensor_autoload_sum > 20))
+#else
+	if ((fsensor_autoload_c >= 6) && (fsensor_autoload_sum > 10))
+#endif
 	{
 //		puts_P(_N("fsensor_check_autoload = true !!!\n"));
 		return true;
